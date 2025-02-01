@@ -10,6 +10,7 @@ MPU6050 mpu(mpuAddress);
 
 int ax, ay, az;
 int gx, gy, gz;
+float orient_angle[2];
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
@@ -98,8 +99,10 @@ void walking() {
   delay(d);
   pwm.setPWM(2, 0, angleToPulse(m2));
   delay(d);
+  stabilise();
   thighBack1();
   delay(d);
+  stabilise();
   //-----------------------------------------------
   //   //back left
   pwm.setPWM(9, 0, angleToPulse(m9 + a));  //60+40//120-40
@@ -108,6 +111,7 @@ void walking() {
   delay(d);
   pwm.setPWM(9, 0, angleToPulse(m9));  //60+40//120-40
   delay(d);
+  stabilise();
 
   //-----------------------------------------------
   //front left //140
@@ -117,8 +121,10 @@ void walking() {
   delay(d);
   pwm.setPWM(5, 0, angleToPulse(m5));  //120-40   //60+40 140 //60
   delay(d);
+  stabilise();
   thighBack2();
   delay(d);
+  stabilise();
   //-----------------------------------------------
   //back right  //140
   pwm.setPWM(13, 0, angleToPulse(m13 - a));
@@ -127,6 +133,7 @@ void walking() {
   delay(d);
   pwm.setPWM(13, 0, angleToPulse(m13));
   delay(d);
+  stabilise();
   //------------------------------------------------
 }
 
@@ -161,11 +168,13 @@ int walking2() {
 void thighBack2() {
   pwm.setPWM(1, 0, angleToPulse(m1 - b));
   pwm.setPWM(10, 0, angleToPulse(m10 + b));
+  stabilise();
 }
 
 void thighBack1() {
   pwm.setPWM(4, 0, angleToPulse(m4 + b));
   pwm.setPWM(14, 0, angleToPulse(m14 - b));
+  stabilise();
 }
 int angleToPulse(int ang) {
   int pulse = map(ang, 0, 180, SERVOMIN, SERVOMAX);  // map angle of 0 to 180 to Servo min and Servo max
@@ -182,6 +191,8 @@ void orientation(){
   //Calculate tilt angles
   float accel_ang_x = atan(ax / sqrt(pow(ay, 2) + pow(az, 2)))*(180.0 / 3.14);
   float accel_ang_y = atan(ay / sqrt(pow(ax, 2) + pow(az, 2)))*(180.0 / 3.14);
+  orient_angle[0] = accel_ang_x;
+  orient_angle[1] = accel_ang_y;
 
   // Show results
   Serial.print("Tilt in X: ");
@@ -189,4 +200,14 @@ void orientation(){
   Serial.print("\tTilt in Y:");
   Serial.println(accel_ang_y);
   delay(10);
+}
+
+void stabilise(){
+  orientation();
+  if(orient_angle[0] >= 30 || orient_angle[0] <= -30){
+    initialise();
+  }
+  else if(orient_angle[1] >= 30 || orient_angle[2] <= -30){
+    initialise();
+  }
 }
