@@ -10,7 +10,7 @@ MPU6050 mpu(mpuAddress);
 
 int ax, ay, az;
 int gx, gy, gz;
-float orient_angle[2];
+float orient_x,orient_y;
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
@@ -191,8 +191,8 @@ void orientation(){
   //Calculate tilt angles
   float accel_ang_x = atan(ax / sqrt(pow(ay, 2) + pow(az, 2)))*(180.0 / 3.14);
   float accel_ang_y = atan(ay / sqrt(pow(ax, 2) + pow(az, 2)))*(180.0 / 3.14);
-  orient_angle[0] = accel_ang_x;
-  orient_angle[1] = accel_ang_y;
+  orient_x = accel_ang_x;
+  orient_y = accel_ang_y;
 
   // Show results
   Serial.print("Tilt in X: ");
@@ -204,10 +204,10 @@ void orientation(){
 
 void stabilise(){
   orientation();
-  if(orient_angle[0] >= 30 || orient_angle[0] <= -30){
+  if(orient_x >= 30 || orient_x <= -30){
     initialise();
   }
-  else if(orient_angle[1] >= 30 || orient_angle[2] <= -30){
+  else if(orient_y >= 30 || orient_y <= -30){
     initialise();
   }
 }
